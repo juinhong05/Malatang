@@ -1,13 +1,24 @@
 import React, {useState,useEffect,useRef} from 'react';
 import {createRoot} from 'react-dom/client';
-import {INGREDIENTS,RATE,createOrder,summarize,evaluate,money} from './game';
+import {INGREDIENTS,RATE,createOrder,summarize,bowlPortions,evaluate,money} from './game';
 import './styles.css';
+import './counter-update.css';
 
 function Icon({name,size=20,...props}) {
   const paths={bowl:<><path d="M3 11h18c0 6-4 9-9 9s-9-3-9-9Z"/><path d="M8 6c-2-2 2-2 0-4m5 4c-2-2 2-2 0-4m5 4c-2-2 2-2 0-4M8 22h8"/></>,scale:<><path d="M6 7h12l3 14H3L6 7Z"/><path d="M12 7V3M7 3h10m-8 9a4 4 0 0 1 6 0l-3 3Z"/></>,leaf:<><path d="M20 3C9 2 2 8 5 16c8 5 15-2 15-13Z"/><path d="m3 21 12-13"/></>,clock:<><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,check:<path d="m5 12 4 4L19 6"/>,arrow:<path d="M4 12h16m-6-6 6 6-6 6"/>,sound:<><path d="m11 4-5 4H2v8h4l5 4V4Z"/><path d="M15 8q5 4 0 8m3-11q8 7 0 14"/></>,help:<><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 1 1 4 3l-1 1m0 3h.01"/></>,star:<path d="m12 2 3 6.5 7 1-5 5 1.2 7-6.2-3.4-6.2 3.4 1.2-7-5-5 7-1Z"/>,close:<path d="m6 6 12 12M6 18 18 6"/>,coin:<><ellipse cx="12" cy="7" rx="8" ry="4"/><path d="M4 7v5c0 5 16 5 16 0V7M4 12v5c0 5 16 5 16 0v-5"/></>};
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name]||paths.bowl}</svg>;
 }
-function Art({index,className='',style={}}){return <span aria-hidden="true" className={`art ${className}`} style={{backgroundPosition:`${index%4*100/3}% ${Math.floor(index/4)*100/3}%`,...style}}/>;}
+function Art({index,className='',style={},...props}){
+  const sheet=index<16?{file:'ingredients',columns:4,rows:4,cell:index}
+    :index<28?{file:'ingredients-extra-1',columns:4,rows:3,cell:index-16}
+    :index<40?{file:'ingredients-extra-2',columns:4,rows:3,cell:index-28}
+    :{file:'ingredients-extra-3',columns:3,rows:3,cell:index-40};
+  return <span aria-hidden="true" className={`art ${className}`} style={{
+    backgroundImage:`url('/art/${sheet.file}.png')`,
+    backgroundSize:`${sheet.columns*100}% ${sheet.rows*100}%`,
+    backgroundPosition:`${sheet.cell%sheet.columns*100/(sheet.columns-1)}% ${Math.floor(sheet.cell/sheet.columns)*100/(sheet.rows-1)}%`,...style,
+  }} {...props}/>;
+}
 function Modal({children,label,onClose}) {
   const ref=useRef(null);
   useEffect(()=>{const el=ref.current;const previous=document.activeElement;el.showModal();return ()=>{el.close();previous?.focus();};},[]);
@@ -15,12 +26,17 @@ function Modal({children,label,onClose}) {
 }
 function Counter({bowl,onAdd,disabled}) {
   const [category,setCategory]=useState('All ingredients');
+  const [query,setQuery]=useState('');
+  const scrollRef=useRef(null);
+  useEffect(()=>{if(scrollRef.current)scrollRef.current.scrollTop=0;},[category,query]);
   const categories=['All ingredients','Vegetables','Protein','Noodles','Extras'];
+  const ingredients=INGREDIENTS.filter(i=>(category==='All ingredients'||i.category===category)&&i.name.toLowerCase().includes(query.trim().toLowerCase()));
   return <section className="counter" aria-label="Cold storage ingredient cabinet">
     <div className="counter-heading"><h2><Icon name="leaf" size={27}/> The fresh counter</h2><span className="rate"><Icon name="scale"/>{money(RATE)} <span>/ 100 g</span></span></div>
     <div className="tabs" role="group" aria-label="Filter ingredients">{categories.map(c=><button key={c} aria-pressed={category===c} className={category===c?'active':''} onClick={()=>setCategory(c)}>{c}</button>)}</div>
-    <div className="cabinet"><div className="cabinet-light"/><div className="ingredients">{INGREDIENTS.filter(i=>category==='All ingredients'||i.category===category).map(i=><button className="tray" key={i.id} onClick={()=>onAdd(i.id)} disabled={disabled || (bowl[i.id]||0)>=12} aria-label={`Add ${i.name}`}><Art index={i.art}/>{bowl[i.id]>0&&<span className="tray-count">{bowl[i.id]} in bowl</span>}<span className="tray-label">{i.name}<span className="plus">+</span></span></button>)}</div><div className="cabinet-vent"><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/></div></div>
-    <div className="counter-note"><span className="fresh-dot"/> Freshly stocked. Full of possibilities.<span>Tap a tray to add a portion</span></div>
+    <div className="counter-search"><input type="search" aria-label="Search ingredients" placeholder="Find your favourites…" value={query} onChange={e=>setQuery(e.target.value)}/><span aria-live="polite">{ingredients.length} / {INGREDIENTS.length}</span></div>
+    <div className="cabinet"><div className="cabinet-light"/><div className="ingredients-scroll" ref={scrollRef} tabIndex={0} role="region" aria-label="Ingredient trays — scroll for more"><div className="ingredients">{ingredients.map(i=><button className="tray" key={i.id} onClick={()=>onAdd(i.id)} disabled={disabled || (bowl[i.id]||0)>=12} aria-label={`Add ${i.name}`}><Art index={i.art}/>{bowl[i.id]>0&&<span className="tray-count">{bowl[i.id]} in bowl</span>}<span className="tray-label"><span>{i.name}</span><span className="plus">+</span></span></button>)}</div>{!ingredients.length&&<p className="no-ingredients">No ingredients found. Try another search or category.</p>}</div><div className="cabinet-vent"><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/></div></div>
+    <div className="counter-note"><span className="fresh-dot"/> {INGREDIENTS.length} fresh ingredients to explore.<span>Scroll the cabinet for more ↓</span></div>
   </section>;
 }
 function OrderTicket({order,bowl,remaining,started}) {
@@ -29,7 +45,18 @@ function OrderTicket({order,bowl,remaining,started}) {
 }
 function Bowl({bowl,onRemove,onClear,onServe,disabled,weighing}) {
   const {items,portions}=summarize(bowl);
-  return <section className="bowl-section"><div className="bowl-heading"><h2>Your bowl</h2><span>{portions} {portions===1?'portion':'portions'}<button className="text-button" onClick={onClear} disabled={!portions||disabled}>Clear</button></span></div><div className={`bowl-stage ${weighing?'weighing':''}`}><Art index={12} className="bowl-art"/>{items.slice(0,7).map((i,n)=><Art key={i.id} index={i.art} className="bowl-food" style={{left:`${29+(n%4)*10}%`,top:`${18+Math.floor(n/4)*15}%`,transform:`rotate(${n%2?12:-8}deg)`}}/>)}</div>{portions?<div className="bowl-items" aria-label="Selected ingredients">{items.map(i=><button onClick={()=>onRemove(i.id)} disabled={disabled} key={i.id} aria-label={`Remove one ${i.name}`}>{i.name} <b>×{i.quantity}</b><span>−</span></button>)}</div>:<p className="bowl-empty">Good things start with an empty bowl.</p>}<button className="serve-button" disabled={!portions||disabled} onClick={onServe}><Icon name="scale" size={23}/>{weighing?'Weighing your bowl…':'Weigh & serve'}{!weighing&&<Icon name="arrow"/>}</button><p className="bowl-hint">Trust your instincts. The scale reveals all.</p></section>;
+  const pieces=bowlPortions(bowl);
+  const columns=Math.max(1,Math.ceil(Math.sqrt(portions*1.8)));
+  const rows=Math.max(1,Math.ceil(portions/columns));
+  const size=Math.min(58,190/columns,85/rows);
+  return <section className="bowl-section"><div className="bowl-heading"><h2>Your bowl</h2><span>{portions} {portions===1?'portion':'portions'}<button className="text-button" onClick={onClear} disabled={!portions||disabled}>Clear</button></span></div>
+    <div className={`bowl-stage ${weighing?'weighing':''}`} role="img" aria-label={portions?`Bowl containing ${items.map(i=>`${i.quantity} ${i.name}`).join(', ')}`:'Empty bowl'}>
+      <Art index={12} className="bowl-art"/>
+      {pieces.map((i,n)=>{const row=Math.floor(n/columns);const rowCount=Math.min(columns,portions-row*columns);return <Art key={i.key} index={i.art} className="bowl-food" data-ingredient={i.id} data-portion={i.portion} style={{
+        width:`${size}px`,left:`calc(50% + ${(n%columns-(rowCount-1)/2)*size*.9}px)`,top:`${64+(row-(rows-1)/2)*size*.62}px`,transform:`translate(-50%, -50%) rotate(${n%2?7:-7}deg)`,
+      }}/>;})}
+    </div>
+    {portions?<div className="bowl-items" aria-label="Selected ingredients">{items.map(i=><button onClick={()=>onRemove(i.id)} disabled={disabled} key={i.id} aria-label={`Remove one ${i.name}`}>{i.name} <b>×{i.quantity}</b><span>−</span></button>)}</div>:<p className="bowl-empty">Good things start with an empty bowl.</p>}<button className="serve-button" disabled={!portions||disabled} onClick={onServe}><Icon name="scale" size={23}/>{weighing?'Weighing your bowl…':'Weigh & serve'}{!weighing&&<Icon name="arrow"/>}</button><p className="bowl-hint">Trust your instincts. The scale reveals all.</p></section>;
 }
 function Receipt({order,result,onNext}) {
   return <Modal label="Your round receipt"><div className="receipt"><div className="receipt-brand"><Icon name="bowl" size={28}/> Mala Mama</div><p className="receipt-sub">A LITTLE SPICE. A LOT OF LOVE.</p><div className="receipt-title"><h2>{result.expired?'Time’s up!':result.stars===3?'A perfect bowl!':result.stars===2?'Nicely done!':result.stars===1?'Getting warmer!':'Room to grow!'}</h2><p>Guest {String(order.round).padStart(2,'0')} · {order.guest.name}</p></div><div className="receipt-items"><div className="receipt-table-head"><span>INGREDIENT</span><span>WEIGHT</span><span>PRICE</span></div>{result.items.map(i=><div className="receipt-row" key={i.id}><span>{i.name} <small>×{i.quantity}</small></span><span>{i.weight} g</span><span>{money(i.weight*RATE/100)}</span></div>)}{!result.items.length&&<p>No ingredients selected.</p>}</div><div className="receipt-totals"><div><span>Total weight</span><b>{result.weight} g</b></div><div><span>Total price</span><strong>{money(result.price)}</strong></div></div><div className="receipt-details"><div><span>Customer budget</span><b>{money(order.budget)}</b></div><div><span>Acceptable range</span><b>{money(order.budget-order.tolerance)} – {money(order.budget+order.tolerance)}</b></div><div><span>Perfect weight</span><b>{result.target} g</b></div><div><span>Weight difference</span><b className={result.inRange?'green':'orange'}>{result.difference===0?'Spot on!':`${result.difference>0?'+':''}${result.difference} g (${result.difference>0?'over':'under'})`}</b></div></div><div className="stars" aria-label={`${result.stars} out of 3 stars`}>{[1,2,3].map(s=><Icon name="star" size={38} key={s} className={s<=result.stars?'earned':''}/>)}</div><div className="scores">{[['scale','Weight',result.weightScore],['clock','Speed',result.speed],['check','Order',result.accuracy]].map(([icon,label,value])=><div key={label}><Icon name={icon}/><span>{label}</span><b>{value}%</b></div>)}</div><p className="score-note">{result.expired?'Your guest ran out of patience. No stars or tip this round.':!result.inRange?'A little outside their budget range. Try adjusting your portions.':result.accuracy<100?'A favourite was missing. Check every must-have next time.':result.stars===3?'Just right, right on time. Your guest loved it!':'All their favourites, within budget. A quicker bowl earns more!'}</p><div className="tip"><span>♥ Customer tip</span><strong>{money(result.tip)}</strong></div><button className="serve-button" onClick={onNext}>Next guest<Icon name="arrow"/></button><p className="receipt-thanks">Thank you for cooking with heart.</p></div></Modal>;

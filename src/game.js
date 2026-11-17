@@ -12,6 +12,39 @@ export const INGREDIENTS = [
   {id:'glass',name:'Glass noodles',category:'Noodles',grams:80,art:9},
   {id:'corn',name:'Corn',category:'Extras',grams:60,art:10},
   {id:'eggs',name:'Quail eggs',category:'Extras',grams:30,art:11},
+  {id:'instant',name:'Instant noodles',category:'Noodles',grams:80,art:16},
+  {id:'spam',name:'Spam',category:'Protein',grams:50,art:17},
+  {id:'crab',name:'Crab stick',category:'Protein',grams:30,art:18},
+  {id:'rice-cake',name:'Rice cake',category:'Extras',grams:60,art:19},
+  {id:'sausage',name:'Sausage',category:'Protein',grams:40,art:20},
+  {id:'cheese',name:'Cheese',category:'Extras',grams:20,art:21},
+  {id:'spinach',name:'Spinach',category:'Vegetables',grams:30,art:22},
+  {id:'sprouts',name:'Bean sprouts',category:'Vegetables',grams:30,art:23},
+  {id:'duck-blood',name:'Duck blood',category:'Protein',grams:50,art:24},
+  {id:'tripe',name:'Beef tripe',category:'Protein',grams:40,art:25},
+  {id:'cabbage',name:'Baby Chinese cabbage',category:'Vegetables',grams:50,art:26},
+  {id:'chicken',name:'Chicken',category:'Protein',grams:60,art:27},
+  {id:'potato',name:'Potato',category:'Vegetables',grams:50,art:28},
+  {id:'fish-fillet',name:'Fish fillet',category:'Protein',grams:60,art:29},
+  {id:'cuttlefish',name:'Cuttlefish',category:'Protein',grams:50,art:30},
+  {id:'fungus',name:'Black fungus',category:'Vegetables',grams:20,art:31},
+  {id:'bean-curd',name:'Bean curd',category:'Protein',grams:30,art:32},
+  {id:'egg',name:'Egg',category:'Extras',grams:50,art:33},
+  {id:'cheese-tofu',name:'Cheese tofu',category:'Protein',grams:40,art:34},
+  {id:'seaweed',name:'Seaweed',category:'Vegetables',grams:20,art:35},
+  {id:'pumpkin',name:'Pumpkin',category:'Vegetables',grams:50,art:36},
+  {id:'lobster-ball',name:'Lobster ball',category:'Protein',grams:40,art:37},
+  {id:'squid-ring',name:'Squid ring',category:'Protein',grams:30,art:38},
+  {id:'ramen',name:'Ramen',category:'Noodles',grams:100,art:39},
+  {id:'bacon',name:'Bacon',category:'Protein',grams:40,art:40},
+  {id:'pork-roll',name:'Pork roll',category:'Protein',grams:60,art:41},
+  {id:'corn-noodles',name:'Corn noodles',category:'Noodles',grams:80,art:42},
+  {id:'taiwan-sausage',name:'Taiwan sausage',category:'Protein',grams:50,art:43},
+  {id:'pork-ball',name:'Pork meat ball',category:'Protein',grams:50,art:44},
+  {id:'fortune-bag',name:'Fortune bag',category:'Extras',grams:60,art:45},
+  {id:'chittering',name:'Pork chittering',category:'Protein',grams:40,art:46},
+  {id:'enoki',name:'Enoki mushroom',category:'Vegetables',grams:30,art:47},
+  {id:'dumpling',name:'Dumpling',category:'Extras',grams:40,art:48},
 ];
 export const GUESTS = [
   {name:'Lily',art:13,quote:'A little crunch and something cozy, please!'},
@@ -33,6 +66,12 @@ export function summarize(bowl) {
   const items = INGREDIENTS.filter(i => bowl[i.id]>0).map(i=>({...i,quantity:bowl[i.id],weight:i.grams*bowl[i.id]}));
   const weight = items.reduce((n,i)=>n+i.weight,0);
   return {items,weight,price:Math.round(weight*RATE)/100,portions:items.reduce((n,i)=>n+i.quantity,0)};
+}
+// Preserve one stable visual identity for every portion, including duplicates.
+export function bowlPortions(bowl) {
+  return INGREDIENTS.flatMap(item => Array.from({length:bowl[item.id]||0},(_,portion)=>({
+    ...item,key:`${item.id}-${portion}`,portion:portion+1,
+  })));
 }
 export function evaluate(order,bowl,secondsLeft,expired=false) {
   const totals=summarize(bowl);

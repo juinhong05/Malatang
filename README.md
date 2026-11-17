@@ -11,8 +11,8 @@ The hosted game currently has owner-only access. Anyone can clone this repositor
 ## Features
 
 - Random customer budgets from RM 12 to RM 24, an acceptable range of ±RM 1.50, and required ingredients.
-- Twelve ingredients across vegetables, protein, noodles, and extras, with category filters and repeatable portions.
-- A bowl that fills as you select ingredients; remove individual portions or clear the bowl.
+- Forty-five ingredients across vegetables, protein, noodles, and extras, with search, category filters, a scrollable cabinet, and repeatable portions.
+- Every selected portion appears separately in the bowl, including duplicates; remove individual portions or clear the bowl.
 - Hidden portion weights until weigh-in, encouraging estimation and learning from receipts.
 - A patience bar that starts with the first ingredient and pauses while instructions are open.
 - Itemized receipts showing selected items, weight, price, budget, ideal weight, and signed weight difference.
@@ -69,11 +69,13 @@ Missing a required ingredient or being outside the acceptable range caps the res
 | Command | Purpose |
 | --- | --- |
 | `npm run dev` | Start the local development server |
-| `npm test` | Run six game-rule tests with Node's test runner |
+| `npm test` | Run eight game-rule tests with Node's test runner |
 | `npm run build` | Produce the static site in `dist/` |
 | `npm run preview` | Preview the production build locally |
 
 Tests cover achievable orders, exact-weight scoring, required ingredients, budget boundaries, timeouts, empty bowls, and tip calculations. Browser checks during development covered desktop and mobile play, adding/removing ingredients, filtering, receipt rendering, timer pausing, expiry, and next-guest reset.
+
+Expanded-catalogue regression checks also cover one visual per portion, more than seven ingredient types, all 45 ingredients in scoring, repeated tofu portions, search, all new artwork, and mobile overflow.
 
 ## Project structure
 
@@ -83,8 +85,12 @@ src/
   game.js           Ingredients, customer orders, totals, and scoring
   game.test.js      Game-rule tests
   styles.css        Responsive styling and animation
+  counter-update.css Expanded cabinet, search, and portion layout
 public/art/
   ingredients.png   Transparent food, bowl, and portrait sprite atlas
+  ingredients-extra-1.png  New ingredients 1–12 (4×3 atlas)
+  ingredients-extra-2.png  New ingredients 13–24 (4×3 atlas)
+  ingredients-extra-3.png  New ingredients 25–33 (3×3 atlas)
 design/
   concept.png       Original visual concept (not a gameplay screenshot)
   design-notes.md   Art direction and implementation notes

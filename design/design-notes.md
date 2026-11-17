@@ -1,5 +1,13 @@
 # Mala Mama design
 
+## Expanded counter and portion rendering
+
+Added 33 ingredient illustrations with the built-in image generation tool, retaining the transparent gouache style. Final assets: `public/art/ingredients-extra-1.png`, `public/art/ingredients-extra-2.png`, and `public/art/ingredients-extra-3.png`. Each uses equal square sprite cells and no labels or trays baked into the artwork.
+
+Prompt set: consistent three-quarter overhead hand-painted hotpot ingredients, generous cell padding, no text or background. Sheet 1 (4×3): instant noodles, Spam, crab stick, rice cake; sausage, cheese, spinach, bean sprouts; duck blood, beef tripe, baby Chinese cabbage, chicken. Sheet 2 (4×3): potato, fish fillet, cuttlefish, black fungus; bean curd, egg, cheese tofu, seaweed; pumpkin, lobster ball, squid ring, ramen. Sheet 3 (3×3): bacon, pork roll, corn noodles; Taiwan sausage, pork meat ball, fortune bag; pork chittering, enoki mushroom, dumpling. A background-extraction edit removed the third sheet's backdrop while preserving its positions and artwork.
+
+The counter now scrolls and supports text search combined with the existing category filters. Long labels wrap. The bowl renders one stable sprite per selected portion, without the former seven-type limit, and scales its arrangement to fit. Three tofu portions visibly render three illustrations. Desktop (1440×1000) and mobile (390×844) browser checks verified all 45 selections, duplicate removal, receipt weights and prices, searches, filtering, all four asset sheets, and next-guest clearing without runtime errors or horizontal overflow.
+
 Concept: warm cream (#f7f4eb), deep green (#23483e), sage cabinet (#809272), burnt-orange actions (#cc5b36). Fraunces display headings paired with DM Sans interface text. A metal four-column ingredient cabinet next to a paper customer order and illustrated bowl. At narrow widths the order, three-column cabinet, and bowl stack in playing order. Receipt opens as a centered paper dialog.
 
 The concept's receipt inset describes the post-round state; it is not permanently visible beside the game. All controls, labels, score calculations, and timer are native UI. Food, bowl, and customer portraits use a generated transparent 4×4 sprite atlas. Local fallbacks keep typography readable if Google Fonts is unavailable.
