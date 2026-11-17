@@ -13,6 +13,8 @@ The hosted game currently has owner-only access. Anyone can clone this repositor
 - Random customer budgets from RM 12 to RM 24, an acceptable range of ±RM 1.50, and required ingredients.
 - Forty-five ingredients across vegetables, protein, noodles, and extras, with search, category filters, paged cabinet navigation, and repeatable portions.
 - Every selected portion appears separately in the bowl, including duplicates; remove individual portions or clear the bowl.
+- Animated wooden chopsticks grip each pick, carry it from the tray, and release it into the bowl. Rapid picks queue without losing quantities.
+- A dimensional ceramic bowl with stable, irregular food placement, perspective, contact shadows, natural overlap, and a foreground rim. An off-screen bowl preview keeps mobile deliveries visible.
 - Hidden portion weights until weigh-in, encouraging estimation and learning from receipts.
 - A patience bar that starts with the first ingredient and pauses while instructions are open.
 - Itemized receipts showing selected items, weight, price, budget, ideal weight, and signed weight difference.
@@ -79,11 +81,18 @@ Expanded-catalogue regression checks also cover one visual per portion, more tha
 
 The cabinet shows 12 ingredients per page on desktop and 6 on smaller screens, with no internal scrolling. The orange bar marks the current page. Search and category changes reset to the first page; resizing preserves the ingredient position. Browser checks cover all 45 ingredients across pages, direct bar selection, next/previous boundaries, keyboard operation, selection persistence, and receipts.
 
+Animation checks cover pickup/carry/release, queued repeated portions, cancellation on removal/clear, serving while picks are in flight, next-guest cleanup, mobile destination visibility, and immediate placement for reduced-motion preferences. Accepted selections count immediately for pricing; the visual portion lands after its transfer. Serving or patience expiry settles pending visuals and counts each selection once.
+
 ## Project structure
 
 ```text
 src/
   main.jsx          React interface and round lifecycle
+  Art.jsx           Shared ingredient sprite rendering
+  BowlScene.jsx     Layered ceramic bowl and food pile
+  IngredientTransfer.jsx Chopstick grip, carry, and release animation
+  bowl-layout.js    Stable irregular portion positioning
+  serving-motion.css Bowl depth, shadows, transfer, and mobile preview
   game.js           Ingredients, customer orders, totals, and scoring
   game.test.js      Game-rule tests
   styles.css        Responsive styling and animation
@@ -93,6 +102,8 @@ public/art/
   ingredients-extra-1.png  New ingredients 1–12 (4×3 atlas)
   ingredients-extra-2.png  New ingredients 13–24 (4×3 atlas)
   ingredients-extra-3.png  New ingredients 25–33 (3×3 atlas)
+  bowl-depth.png    Realistic empty ceramic bowl, layered behind/in front of food
+  chopstick.png     Single wooden chopstick, duplicated into an animated pair
 design/
   concept.png       Original visual concept (not a gameplay screenshot)
   design-notes.md   Art direction and implementation notes

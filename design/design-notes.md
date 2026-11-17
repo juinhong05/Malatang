@@ -1,5 +1,15 @@
 # Mala Mama design
 
+## Chopstick delivery and dimensional bowl
+
+Replaced the evenly spaced food grid with stable seeded positions, per-portion rotation, a consistent perspective, alpha-shaped contact shadows, a shared pile shadow, and depth sorting. Food is clipped to the inner cavity; a second copy of the bowl clipped to the curved front rim occludes the contents. All selected portions remain represented. Existing food sprites are reused; bowl and utensil artwork are newly generated with the built-in image-generation tool.
+
+Asset `public/art/bowl-depth.png` prompt: one empty ivory glazed ceramic malatang bowl with terracotta rim and green exterior leaf motif, realistic studio lighting from upper left, visibly deep interior, elevated three-quarter view, subtle inner ambient occlusion, transparent outside the object; compositing-friendly opening and front rim. No food, text, or chopsticks.
+
+Asset `public/art/chopstick.png` prompt: one single vertical tapered honey-brown wooden chopstick with realistic wood grain and warm left highlight, centered on a transparent square canvas, full length visible from y4% to y96%, no hands, food, text, or second utensil. The sprite is duplicated and independently rotated to form a pinching pair.
+
+Each accepted pick queues a 0.72–1.1-second grip/lift/carry/release animation along a curved path. Destination coordinates are recalculated during motion to follow scrolling and resizing. The settled portion appears after delivery. Rapid additions, removal, clearing, help, serving, expiry, and round changes preserve the authoritative quantity totals. A compact bowl preview appears when the main bowl is off-screen. Reduced-motion users receive immediate placement. Playwright on Edge verified 1440×1100 desktop and 390×844 mobile, including all transfer phases, six queued picks with three tofu portions, cancellation, in-flight receipt totals, next-guest cleanup, dock visibility, and no runtime errors.
+
 ## Cabinet pagination
 
 Converted the decorative vent bars supplied in the user's reference into clickable page selectors, retaining their slim rounded shape. Current page is orange; previous and next arrows flank the bars, with disabled boundary states. Each bar has a 44px-tall click area, keyboard focus, an accessible page label, and `aria-current`. The footer reports the page and visible ingredient range. Desktop uses 12 ingredients per page; widths at or below 850px use 6. The cabinet no longer has an internal scroll area. Search and category changes return to page one, and selection quantities survive page changes and viewport resizing. Screenshot capture's transient 1px viewport exposed a page reset; storing ingredient offset instead of page number fixed it. Verified at 1440×1000 and 390×844, including all 45 ingredients, keyboard navigation, empty search, receipt totals, and next guest.

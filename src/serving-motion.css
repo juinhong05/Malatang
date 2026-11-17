@@ -1,0 +1,20 @@
+.bowl-stage{height:auto;max-width:340px;margin:0 auto}
+.bowl-scene{position:relative;width:100%;aspect-ratio:1;isolation:isolate;pointer-events:none}
+.ceramic-bowl{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;user-select:none;pointer-events:none}
+.bowl-cavity{position:absolute;inset:0;z-index:1;clip-path:ellipse(43% 30% at 49% 44%)}
+.pile-contact{position:absolute;left:18%;top:34%;width:64%;height:35%;border-radius:50%;background:radial-gradient(ellipse,#4d2d0b88,transparent 72%);filter:blur(5px)}
+.pile-piece{position:absolute;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;animation:food-settle .28s cubic-bezier(.2,.7,.4,1.3) both}
+.pile-piece>.bowl-food{position:static;display:block;width:100%;height:100%;transform:rotate(var(--food-angle)) scaleY(.82);filter:drop-shadow(1px 5px 3px #4b2f105c) saturate(.96);animation:none}
+.bowl-front{z-index:2;clip-path:polygon(5% 44%,8% 55%,16% 64%,31% 71%,49% 74%,67% 71%,82% 64%,91% 55%,94% 44%,100% 100%,0 100%)}
+.ingredient-transfer{position:fixed;left:0;top:0;width:0;height:0;z-index:80;pointer-events:none;will-change:transform;opacity:0}
+.carried-food{position:absolute;left:0;top:0;transform:translate(-50%,-50%);filter:drop-shadow(2px 9px 4px #37230c4a);will-change:transform}
+.carried-food>.art{width:100%;height:auto}
+.moving-chopstick{position:absolute;width:210px;height:210px;left:-105px;top:-201.6px;transform-origin:50% 96%;object-fit:contain;filter:drop-shadow(1px 2px 1px #3c261f30);pointer-events:none;user-select:none}
+.bowl-dock{position:fixed;bottom:14px;right:14px;width:154px;z-index:40;padding:0 7px 9px;border:1px solid #d1d5bd;border-radius:14px;background:#f7f4ebf7;box-shadow:0 7px 25px #25392b28;cursor:pointer}
+.bowl-dock>.bowl-scene{width:138px;height:138px;margin-top:-10px}
+.bowl-dock>span{display:block;font-size:10px;line-height:1.3;color:var(--green);margin-top:-9px}
+.bowl-dock[hidden]{display:none}
+.bowl-section .bowl-items{margin-top:-15px}
+@keyframes food-settle{0%{translate:0 -9px;scale:1.08}65%{translate:0 2px;scale:.98}100%{translate:0 0;scale:1}}
+@media(max-width:600px){.bowl-stage{height:auto;max-width:320px}.bowl-dock{width:136px;right:10px;bottom:10px;padding:0 5px 9px}.bowl-dock>.bowl-scene{width:124px;height:124px}.moving-chopstick{width:175px;height:175px;left:-87.5px;top:-168px}}
+@media(prefers-reduced-motion:reduce){.pile-piece{animation:none}.ingredient-transfer{display:none}}
