@@ -27,16 +27,32 @@ function Modal({children,label,onClose}) {
 function Counter({bowl,onAdd,disabled}) {
   const [category,setCategory]=useState('All ingredients');
   const [query,setQuery]=useState('');
-  const scrollRef=useRef(null);
-  useEffect(()=>{if(scrollRef.current)scrollRef.current.scrollTop=0;},[category,query]);
+  const [pageOffset,setPageOffset]=useState(0);
+  const [pageSize,setPageSize]=useState(()=>window.matchMedia('(max-width: 850px)').matches?6:12);
+  useEffect(()=>{
+    const media=window.matchMedia('(max-width: 850px)');
+    const resize=()=>setPageSize(media.matches?6:12);
+    media.addEventListener('change',resize);
+    return ()=>media.removeEventListener('change',resize);
+  },[]);
+  const setPage=n=>setPageOffset(n*pageSize);
   const categories=['All ingredients','Vegetables','Protein','Noodles','Extras'];
   const ingredients=INGREDIENTS.filter(i=>(category==='All ingredients'||i.category===category)&&i.name.toLowerCase().includes(query.trim().toLowerCase()));
+  const pageCount=Math.max(1,Math.ceil(ingredients.length/pageSize));
+  const currentPage=Math.min(Math.floor(pageOffset/pageSize),pageCount-1);
+  const visibleIngredients=ingredients.slice(currentPage*pageSize,(currentPage+1)*pageSize);
   return <section className="counter" aria-label="Cold storage ingredient cabinet">
     <div className="counter-heading"><h2><Icon name="leaf" size={27}/> The fresh counter</h2><span className="rate"><Icon name="scale"/>{money(RATE)} <span>/ 100 g</span></span></div>
-    <div className="tabs" role="group" aria-label="Filter ingredients">{categories.map(c=><button key={c} aria-pressed={category===c} className={category===c?'active':''} onClick={()=>setCategory(c)}>{c}</button>)}</div>
-    <div className="counter-search"><input type="search" aria-label="Search ingredients" placeholder="Find your favourites…" value={query} onChange={e=>setQuery(e.target.value)}/><span aria-live="polite">{ingredients.length} / {INGREDIENTS.length}</span></div>
-    <div className="cabinet"><div className="cabinet-light"/><div className="ingredients-scroll" ref={scrollRef} tabIndex={0} role="region" aria-label="Ingredient trays — scroll for more"><div className="ingredients">{ingredients.map(i=><button className="tray" key={i.id} onClick={()=>onAdd(i.id)} disabled={disabled || (bowl[i.id]||0)>=12} aria-label={`Add ${i.name}`}><Art index={i.art}/>{bowl[i.id]>0&&<span className="tray-count">{bowl[i.id]} in bowl</span>}<span className="tray-label"><span>{i.name}</span><span className="plus">+</span></span></button>)}</div>{!ingredients.length&&<p className="no-ingredients">No ingredients found. Try another search or category.</p>}</div><div className="cabinet-vent"><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/><i/></div></div>
-    <div className="counter-note"><span className="fresh-dot"/> {INGREDIENTS.length} fresh ingredients to explore.<span>Scroll the cabinet for more ↓</span></div>
+    <div className="tabs" role="group" aria-label="Filter ingredients">{categories.map(c=><button key={c} aria-pressed={category===c} className={category===c?'active':''} onClick={()=>{setCategory(c);setPage(0);}}>{c}</button>)}</div>
+    <div className="counter-search"><input type="search" aria-label="Search ingredients" placeholder="Find your favourites…" value={query} onChange={e=>{setQuery(e.target.value);setPage(0);}}/><span aria-live="polite">{ingredients.length} / {INGREDIENTS.length}</span></div>
+    <div className="cabinet"><div className="cabinet-light"/><div className="ingredients-page" id="ingredient-page" role="region" aria-label={`Ingredient page ${currentPage+1} of ${pageCount}`}><div className="ingredients">{visibleIngredients.map(i=><button className="tray" key={i.id} onClick={()=>onAdd(i.id)} disabled={disabled || (bowl[i.id]||0)>=12} aria-label={`Add ${i.name}`}><Art index={i.art}/>{bowl[i.id]>0&&<span className="tray-count">{bowl[i.id]} in bowl</span>}<span className="tray-label"><span>{i.name}</span><span className="plus">+</span></span></button>)}{pageCount>1&&Array.from({length:pageSize-visibleIngredients.length},(_,n)=><span key={`empty-${n}`} className="tray tray-placeholder" aria-hidden="true"/>)}</div>{!ingredients.length&&<p className="no-ingredients">No ingredients found. Try another search or category.</p>}</div>
+      <nav className="cabinet-pagination" aria-label="Ingredient pages">
+        <button className="page-arrow previous" aria-label="Previous ingredient page" aria-controls="ingredient-page" disabled={currentPage===0} onClick={()=>setPage(currentPage-1)}><Icon name="arrow" size={17}/></button>
+        <div className="page-bars">{Array.from({length:pageCount},(_,n)=><button key={n} className="page-bar" aria-label={`Go to ingredient page ${n+1}`} aria-current={currentPage===n?'page':undefined} aria-controls="ingredient-page" title={`Page ${n+1}`} onClick={()=>setPage(n)}><span/></button>)}</div>
+        <button className="page-arrow" aria-label="Next ingredient page" aria-controls="ingredient-page" disabled={currentPage===pageCount-1} onClick={()=>setPage(currentPage+1)}><Icon name="arrow" size={17}/></button>
+      </nav>
+    </div>
+    <div className="counter-note"><span className="fresh-dot"/><span className="page-status" role="status">{ingredients.length?`Page ${currentPage+1} of ${pageCount} · ${currentPage*pageSize+1}–${Math.min((currentPage+1)*pageSize,ingredients.length)} of ${ingredients.length} ingredients`:'No matching ingredients'}</span><span>Tap a bar to change pages</span></div>
   </section>;
 }
 function OrderTicket({order,bowl,remaining,started}) {

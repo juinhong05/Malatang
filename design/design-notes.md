@@ -1,5 +1,9 @@
 # Mala Mama design
 
+## Cabinet pagination
+
+Converted the decorative vent bars supplied in the user's reference into clickable page selectors, retaining their slim rounded shape. Current page is orange; previous and next arrows flank the bars, with disabled boundary states. Each bar has a 44px-tall click area, keyboard focus, an accessible page label, and `aria-current`. The footer reports the page and visible ingredient range. Desktop uses 12 ingredients per page; widths at or below 850px use 6. The cabinet no longer has an internal scroll area. Search and category changes return to page one, and selection quantities survive page changes and viewport resizing. Screenshot capture's transient 1px viewport exposed a page reset; storing ingredient offset instead of page number fixed it. Verified at 1440×1000 and 390×844, including all 45 ingredients, keyboard navigation, empty search, receipt totals, and next guest.
+
 ## Expanded counter and portion rendering
 
 Added 33 ingredient illustrations with the built-in image generation tool, retaining the transparent gouache style. Final assets: `public/art/ingredients-extra-1.png`, `public/art/ingredients-extra-2.png`, and `public/art/ingredients-extra-3.png`. Each uses equal square sprite cells and no labels or trays baked into the artwork.

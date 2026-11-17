@@ -11,7 +11,7 @@ The hosted game currently has owner-only access. Anyone can clone this repositor
 ## Features
 
 - Random customer budgets from RM 12 to RM 24, an acceptable range of ±RM 1.50, and required ingredients.
-- Forty-five ingredients across vegetables, protein, noodles, and extras, with search, category filters, a scrollable cabinet, and repeatable portions.
+- Forty-five ingredients across vegetables, protein, noodles, and extras, with search, category filters, paged cabinet navigation, and repeatable portions.
 - Every selected portion appears separately in the bowl, including duplicates; remove individual portions or clear the bowl.
 - Hidden portion weights until weigh-in, encouraging estimation and learning from receipts.
 - A patience bar that starts with the first ingredient and pauses while instructions are open.
@@ -36,7 +36,7 @@ Open the local URL printed by Vite. Gameplay runs entirely in the browser; no AP
 ## How to play
 
 1. Read the customer's budget, acceptable price range, and must-have ingredients.
-2. Tap ingredient trays to add portions. Your first pick starts the timer.
+2. Tap ingredient trays to add portions. Use the bars or arrows below the cabinet to change pages; your bowl keeps its selections. Your first pick starts the timer.
 3. Tap an ingredient listed beneath your bowl to remove one portion, or use **Clear** to empty it.
 4. Select **Weigh & serve** to reveal the bowl's weight and price. Everything costs **RM 3.00 per 100 g**.
 5. Review your receipt and select **Next guest** to continue.
@@ -76,6 +76,8 @@ Missing a required ingredient or being outside the acceptable range caps the res
 Tests cover achievable orders, exact-weight scoring, required ingredients, budget boundaries, timeouts, empty bowls, and tip calculations. Browser checks during development covered desktop and mobile play, adding/removing ingredients, filtering, receipt rendering, timer pausing, expiry, and next-guest reset.
 
 Expanded-catalogue regression checks also cover one visual per portion, more than seven ingredient types, all 45 ingredients in scoring, repeated tofu portions, search, all new artwork, and mobile overflow.
+
+The cabinet shows 12 ingredients per page on desktop and 6 on smaller screens, with no internal scrolling. The orange bar marks the current page. Search and category changes reset to the first page; resizing preserves the ingredient position. Browser checks cover all 45 ingredients across pages, direct bar selection, next/previous boundaries, keyboard operation, selection persistence, and receipts.
 
 ## Project structure
 
